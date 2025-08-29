@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis App</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 20px 0;
+            text-align: center;
+            color: white;
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            flex: 1;
+            width: 50%;
+            margin: 30px auto;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        textarea, input[type="text"] {
+            width: 90%;
+            height: 40px;
+            padding: 10px;
+            border: 2px solid #5a67d8;
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            outline: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        input[type="text"] {
+            background: rgba(255, 255, 255, 0.3);
+            font-weight: bold;
+            color: black;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 12px;
+            background: linear-gradient(90deg, #ff9800, #ff5722);
+            color: white;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .custom-file-upload:hover {
+            background: linear-gradient(90deg, #ff5722, #ff9800);
+            transform: scale(1.05);
+        }
+
+        button {
+            width: 90%;
+            padding: 12px;
+            background: linear-gradient(90deg, #5a67d8, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #3b82f6, #5a67d8);
+            transform: scale(1.05);
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            overflow: hidden;
+            color: black;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            text-align: left;
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        tr:nth-child(odd) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        footer {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        footer i {
+            margin: 0 6px;
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <i class="fas fa-brain"></i> Sentiment Analysis Project <i class="fas fa-heartbeat"></i>
+    </header>
+
+    <div class="container">
+        <!--<h2>Duygu Analizi</h2>-->
+        <div style="text-align: center; margin-bottom: 20px;">
+        <i class="fas fa-brain" style="font-size: 48px; color: white;"></i>
+        <p style="margin-top: 10px; color: white; font-size: 20px;">Sentiment Analysis</p>
+    </div>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="input-container">
+                <textarea name="user_text" rows="4" placeholder="Buraya yazın..."></textarea>
+                <input type="text" name="tweets_query" placeholder="arama sorgusu"> 
+                <label for="file-upload" class="custom-file-upload"><i class="fas fa-file-upload"></i> Dosya seç</label>
+                <input id="file-upload" type="file" name="file" accept=".csv">
+                <button type="submit"><i class="fas fa-play-circle"></i> Yükle ve Analiz Et</button>
+            </div>
+        </form>
+
+        {% if results %}
+        <h2>Analysis Results:</h2>
+        <table>
+            <tr>
+                <th>Original Text</th>
+                <th>Cleaned Text</th>
+                <th>Sentiment Label</th>
+                <th>TF-IDF Features</th>
+            </tr>
+            {% for row in results %}
+            <tr>
+                <td>{{ row.text }}</td>
+                <td>{{ row.cleaned_text }}</td>
+                <td>{{ row.Sentiment_Label }}</td>
+                <td>
+                    <ul>
+                    {% for feature, value in row.items() %}
+                        {% if feature not in ['text', 'cleaned_text', 'Sentiment_Label'] %}
+                            <li><strong>{{ feature }}:</strong> {{ value }}</li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+
+    <footer style="text-align: center; margin-top: 20px; color: white;">
+    <p>© 2025 Abdullah Odeh. All rights reserved.</p>
+    <div style="margin-top: 10px;">
+        <!-- GitHub -->
+        <a href="https://github.com/ABOODXP" target="_blank" style="margin: 0 10px; color: white; text-decoration: none;">
+            <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <!-- LinkedIn -->
+        <a href="https://www.linkedin.com/in/abdallah-odeh-38a998363/" target="_blank" style="margin: 0 10px; color: white; text-decoration: none;">
+            <i class="fab fa-linkedin fa-lg"></i>
+        </a>
+
+        <!-- Email -->
+        <a href="mailto:a.y.a.odah3412@gmail.com" style="margin: 0 10px; color: white; text-decoration: none;">
+            <i class="fas fa-envelope fa-lg"></i>
+        </a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!-- templates/results.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>نتائج تحليل المشاعر</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 800;
+            color: #4f46e5;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            border-left: 6px solid #4f46e5;
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            background-color: #eef1f7;
+            transform: scale(1.01);
+        }
+
+        .original-text {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .cleaned-text {
+            color: #6b7280;
+            margin-top: 5px;
+            font-size: 0.95rem;
+        }
+
+        .sentiment-label {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .Positive {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .Negative {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .Neutral {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .features {
+            margin-top: 15px;
+        }
+
+        .feature-tag {
+            display: inline-block;
+            background-color: #e5e7eb;
+            color: #374151;
+            padding: 6px 10px;
+            margin: 3px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .back-btn a {
+            background-color: #4f46e5;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .back-btn a:hover {
+            background-color: #3730a3;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Duygu analizi sonuçları</h1>
+
+        {% for item in results %}
+        <div class="result-card">
+            <div class="original-text">📝 <strong>Orijinal metin:</strong> {{ item.text }}</div>
+            <div class="cleaned-text"><strong>Temizlikten sonra metin:</strong> {{ item.cleaned_text }}</div>
+            <div class="sentiment-label {{ item.Sentiment_Label }}">
+                {{ item.Sentiment_Label }}
+            </div>
+
+            {% if item.TF_IDF_Features %}
+            <div class="features">
+                <strong>📊 En önemli kelimeler (TF-IDF):</strong><br>
+                {% for word, score in item.TF_IDF_Features.items() %}
+                    <span class="feature-tag">{{ word }} ({{ score }})</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <canvas id="myChart" width="400" height="200"></canvas>
+
+        <div class="back-btn">
+            <a href="/">⬅️ Ana sayfaya dön </a>
+        </div>
+    </div>
+    
+    <script>
+  const ctx = document.getElementById('myChart').getContext('2d');
+
+  const myChart = new Chart(ctx, {
+    type: 'bar', // نوع الرسم البياني: أعمدة
+    data: {
+      labels: ['pozitive', 'negative', 'nötr'], // تسميات الفئات (يمكنك تعديلها)
+      datasets: [{
+        label: 'Analiz sayısı',
+        data: [{{ positive_count }}, {{ negative_count }}, {{ neutral_count }}], // بيانات ديناميكية من بايثون
+        backgroundColor: [
+          'rgba(75, 192, 192, 0.6)',
+          'rgba(255, 99, 132, 0.6)',
+          'rgba(201, 203, 207, 0.6)'
+        ],
+        borderColor: [
+          'rgba(75, 192, 192, 1)',
+          'rgba(255, 99, 132, 1)',
+          'rgba(201, 203, 207, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+</script>
+<div class="back-btn" style="margin-top: 20px;">
+    <a href="/static/reports/evaluation_report.pdf" download class="btn btn-success">
+        📥 Raporu PDF olarak indir
+    </a>
+</div>
+</body>
+</html>
